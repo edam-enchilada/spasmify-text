@@ -118,8 +118,7 @@ void ProcessStream(istream& in, const string& name)
 				wIter->second.insert(make_pair(name,1));
 			}
 		}
-		// If it doesn't exist, create it, and add an entry for this file/stream
-		else 
+		else // If it doesn't exist, create it, and add an entry for this file/stream
 		{
 			map<string, int> tempMap;
 			tempMap.insert(make_pair(name,1));
