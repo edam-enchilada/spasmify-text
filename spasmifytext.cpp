@@ -49,6 +49,30 @@ public:
 void PrintSyntax();
 void PrintDebug();
 void ProcessStream(istream& in, const string& out);
+void ToLower(string& str);
+void RemovePunct(string& str);
+
+void ToLower(string& str)
+{
+	for (int i = 0; i < str.length(); i++)
+    {
+      str[i] = tolower(str[i]);
+    }
+}
+
+void RemovePunct(string& str)
+{
+	if (str[str.size()-1] == "." || 
+	    str[str.size()-1] == "," || 
+	    str[str.size()-1] == ";" || 
+	    str[str.size()-1] == ":" || )
+	{
+		cout << "str = " << str << endl;
+		str.remove(str.size()-1);
+		cout << "str = " << str << endl;
+	}
+}
+
 
 // Print out how to use this program from the command line
 void PrintSyntax()
@@ -99,6 +123,7 @@ void ProcessStream(istream& in, const string& name)
 	map<string, int>::iterator fIter;
 	while(in >> temp)
 	{
+		temp = ToLower(temp);
 		// Check for presence of word
 		wIter = g_words.find(temp);
 
@@ -127,7 +152,7 @@ void ProcessStream(istream& in, const string& name)
 	} 
 }
 
-int main(int argc, char* argv[])
+/*int main(int argc, char* argv[])
 {
 	// Store filenames in a set so we don't process the same file twice, doubling
 	// its word counts.
@@ -313,4 +338,10 @@ int main(int argc, char* argv[])
 	// Print the arguments for debugging.
 	PrintDebug(filenames, args);
 #endif
+}
+*/
+
+int main()
+{
+	RemovePunct("Hello!");
 }
