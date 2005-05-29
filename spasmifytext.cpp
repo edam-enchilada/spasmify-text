@@ -41,9 +41,14 @@ class Arguments
 public:
 	bool singleFile;
 	bool stem;
+	bool stopWords;
 	string outFile;
-	Arguments(bool singleFile, bool stem, string outFile) { 
+	
+	Arguments(bool singleFile, bool stem, bool stopWords, string outFile) { 
 		this->singleFile = singleFile; 
+		this->stem = stem;
+		this->stopWords = stopWords;
+		this->outFile = outFile;
 	};
 };
 
@@ -59,9 +64,10 @@ public:
 extern int stem(char* p, int i, int j);
 void PrintSyntax();
 void PrintDebug();
-void ProcessStream(istream& in, const string& out);
+void ProcessStream(istream& in, const string& out, const Arguments& args);
 void ToLower(string& str);
 void RemovePunct(string& str);
+bool IsStopWord(const string& str);
 
 void ToLower(string& str)
 {
@@ -96,6 +102,80 @@ void CallStemmer(string& str)
 	delete [] s;
 }
 
+bool IsStopWord(const string& str)
+{
+	if (str == "the")
+		return true;
+	else if (str == "a")
+		return true;
+	else if (str == "and")
+		return true;
+	else if (str == "or")
+		return true;
+	else if (str == "then")
+		return true;
+	else if (str == "that")
+		return true;
+	else if (str == "of")
+		return true;
+	else if (str == "for")
+		return true;
+	else if (str == "by")
+		return true;
+	else if (str == "as")
+		return true;
+	else if (str == "be")
+		return true;
+	else if (str == "this")
+		return true;
+	else if (str == "we")
+		return true;
+	else if (str == "which")
+		return true;
+	else if (str == "with")
+		return true;
+	else if (str == "at")
+		return true;
+	else if (str == "from")
+		return true;
+	else if (str == "such")
+		return true;
+	else if (str == "there")
+		return true;
+	else if (str == "if")
+		return true;
+	else if (str == "is")
+		return true;
+	else if (str == "it")
+		return true;
+	else if (str == "to")
+		return true;
+	else if (str == "but")
+		return true;
+	else if (str == "those")
+		return true;
+	else if (str == "their")
+		return true;
+	else if (str == "theirs")
+		return true;
+	else if (str == "them")
+		return true;
+	else if (str == "they")
+		return true;
+	else if (str == "too")
+		return true;
+	else if (str == "was")
+		return true;
+	else if (str == "were")
+		return true;
+	else if (str == "who")
+		return true;
+	else if (str == "whose")
+		return true;
+	else
+		return false;
+}
+
 
 // Print out how to use this program from the command line
 void PrintSyntax()
@@ -113,6 +193,7 @@ void PrintSyntax()
 		<< "                                if no file is specified, output\n"
 		<< "                                will be sent to a.edmf/edsf\n"
 		<< "  -p, --porter-stem			  Use the porter-stemming algorithm\n"
+		<< "  -w, --stop-words  		  Remove stop words\n"
 		<< endl
 		<< "All options with arguments require them." << endl
 		<< "Report bugs to <andersbe@gmail.com>." << endl
@@ -140,7 +221,7 @@ void PrintDebug(set<string> filenames, Arguments args)
 * the input stream, adding entries for each new word found in it and 
 * incrementing entries for words already found.
 */
-void ProcessStream(istream& in, const string& name, Arguments args)
+void ProcessStream(istream& in, const string& name, const Arguments& args)
 {
 	string temp;
 	map<string, map<string, int> >::iterator wIter;
@@ -153,6 +234,12 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 		{
 			ToLower(temp);
 			RemovePunct(temp);
+		}
+		
+		if (args.stopWords)
+		{
+			if (IsStopWord(temp))
+				temp = "";
 		}
 		
 		if (temp.size() == 0)
@@ -188,7 +275,7 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 	} 
 }
 
-/*int main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	// Store filenames in a set so we don't process the same file twice, doubling
 	// its word counts.
@@ -203,7 +290,7 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 	bool help = false, unrecognized = false;
 
 
-	Arguments args(false, false, "");
+	Arguments args(false, false, false, "");
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -220,6 +307,10 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 				if (strcmp("--porter-stem",argv[i]) == 0)
 				{
 					args.stem = true;
+				}
+				if (strcmp("--stop-words",argv[i]) == 0)
+				{
+					args.stopWords = true;
 				}
 				else if (strcmp("--help",argv[i]) == 0)
 				{
@@ -251,6 +342,9 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 						break;
 					case 'p':
 						args.stem = true;
+						break;
+					case 'w':
+						args.stopWords = true;
 						break;
 					case 'h':
 						help = true;
@@ -289,7 +383,7 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 	// read from standard input if they don't give any.
 	if (filenames.size() == 0)
 	{
-		ProcessStream(cin, "STDIN");
+		ProcessStream(cin, "STDIN", args);
 	}
 	// otherwise, process the files they input
 	else
@@ -299,7 +393,7 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 		{
 			ifstream fin(fIter->c_str());
 
-			ProcessStream(fin, *fIter);
+			ProcessStream(fin, *fIter, args);
 			fin.close();
 		}
 	}
@@ -381,14 +475,14 @@ void ProcessStream(istream& in, const string& name, Arguments args)
 	// Print the arguments for debugging.
 	PrintDebug(filenames, args);
 #endif
-}*/
+}
 
 
 
-int main()
+/*int main()
 {
 	string hi = "rationale";
 	cout << "hi = " << hi << endl;
 	CallStemmer(hi);
 	cout << "hi = " << hi << endl;
-}
+}*/
