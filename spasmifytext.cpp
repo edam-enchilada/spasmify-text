@@ -91,12 +91,16 @@ void CallStemmer(string& str)
 	ToLower(str);
 	RemovePunct(str);
 	
+	if (str.size() == 0)
+		return;
+	
 	char* s = new char[str.size()];
 	
 	strcpy(s, str.c_str());
 	s[stem(s,0,str.size()-1)+1] = 0;
 	str = s;
-	delete [] s;
+	//TODO: When do we delete this stuff?? Just leave a leak?
+	//delete [] s;
 }
 
 bool IsStopWord(const string& str)
@@ -220,13 +224,17 @@ void PrintDebug(set<string> filenames, Arguments args)
 */
 void ProcessStream(istream& in, const string& name, const Arguments& args)
 {
+	cout << "processing " << name << endl;
+	cout.flush();
 	string temp;
 	map<string, map<string, int> >::iterator wIter;
 	map<string, int>::iterator fIter;
 	while(in >> temp)
 	{
 		if (args.stem)
+		{
 			CallStemmer(temp);
+		}
 		else
 		{
 			ToLower(temp);
@@ -482,4 +490,9 @@ int main(int argc, char* argv[])
 	cout << "hi = " << hi << endl;
 	CallStemmer(hi);
 	cout << "hi = " << hi << endl;
+	
+	string i = "Lady,";
+	CallStemmer(i);
+	cout << "i = " << i << endl;
 }*/
+
