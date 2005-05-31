@@ -79,13 +79,10 @@ void ToLower(string& str)
 
 void RemovePunct(string& str)
 {
-	if (str[str.size()-1] == '.' || 
-	    str[str.size()-1] == ',' || 
-	    str[str.size()-1] == ';' || 
-	    str[str.size()-1] == ':' || 
-	    str[str.size()-1] == '!')
+	for (size_t i = 0; i < str.length(); i++)
 	{
-		str.erase(str.size()-1);
+		if (!isalpha(str[i]))
+			str.erase(i,10);
 	}
 }
 
