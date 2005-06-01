@@ -408,7 +408,7 @@ int main(int argc, char* argv[])
 	if (args.outFile != "")
 	{
 		out = new ofstream(args.outFile.c_str());
-		*out << args.outFile << "^^^^^^^^" << endl;
+		*out << args.outFile << endl << "^^^^^^^^" << endl;
 	}
 	else 
 	{
