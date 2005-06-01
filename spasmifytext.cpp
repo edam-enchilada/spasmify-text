@@ -94,13 +94,12 @@ void CallStemmer(string& str)
 	if (str.size() == 0)
 		return;
 	
-	char* s = new char[str.size()];
+	char* s = new char[str.size()+1];
 	
 	strcpy(s, str.c_str());
 	s[stem(s,0,str.size()-1)+1] = 0;
 	str = s;
-	//TODO: When do we delete this stuff?? Just leave a leak?
-	//delete [] s;
+	delete [] s;
 }
 
 bool IsStopWord(const string& str)
